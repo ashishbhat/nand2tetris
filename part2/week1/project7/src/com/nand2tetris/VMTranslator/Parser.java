@@ -22,6 +22,7 @@ public class Parser {
 
 	public List<VMCommand> parse() {
 		Path sourcePath = Paths.get(sourceFile);
+		String sourceFileName = sourcePath.getFileName().toString().split("\\.")[0];
 		List<String> allLines = null;
 		try {
 			allLines = Files.readAllLines(sourcePath);
@@ -30,7 +31,11 @@ public class Parser {
 			e.printStackTrace();
 		}
 		for (String line : allLines) {
+			if (line.contains("//") || line.isBlank()) {
+				continue;
+			}
 			VMCommand vmCommand = getVmCommand(line);
+			vmCommand.setSourcefile(sourceFileName);
 			commands.add(vmCommand);
 		}
 		return commands;
