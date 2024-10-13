@@ -8,7 +8,7 @@
     M=D
 
     @8192
-    D=A  //8192 word = Entire display
+    D=A  //screen = 256 * 512; word = 8. (256*512)/8 = 8192. 8192 addresses = entrire display.
     @n
     M=D
 
