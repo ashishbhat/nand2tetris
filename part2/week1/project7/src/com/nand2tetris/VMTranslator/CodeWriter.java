@@ -162,75 +162,90 @@ public class CodeWriter {
 	}
 
 	private void generatePopCommand(VMCommand vmCommand) {
-		String segmentPointer = "";
-		String segmentIndex = vmCommand.getArg2();
-		boolean isStatic = vmCommand.getArg1().equals("static");
-		if (vmCommand.getArg1().equals("pointer")) {
-			segmentPointer = vmCommand.getArg2().equals("0") ? "THIS" : "THAT";
-		} else {
-			segmentPointer = getSegementPointer(vmCommand.getArg1(), segmentIndex);
+		PopProcessor popProcessor = new PopProcessor(asm);
+		String segment = vmCommand.getArg1();
+		switch (segment) {
+		case "local":
+		case "argument":
+		case "this":
+		case "that":
+			popProcessor.popProperSegments(vmCommand);
+			break;
+		case "temp":
+			popProcessor.popTemp(vmCommand);
+			break;
+		case "static":
+			popProcessor.popStatic(vmCommand);
+			break;
+		case "pointer":
+			popProcessor.popPointer(vmCommand);
+			break;
+		default:
+
 		}
 
-		if (!isStatic) {
-			calculateSegmentAddr(vmCommand, segmentPointer, segmentIndex);
-		}
-		decrementStackPointer();
-		String variableName = getVariableName(vmCommand.getSourcefile(), segmentIndex, isStatic);
-		// read from stack and store in segment
-		asm.append("A=M\n");
-		asm.append("D=M\n");
-		asm.append("@" + variableName + LINE);
-		if (!isStatic) {
-			asm.append("A=M\n");
-		}
-		asm.append("M=D\n");
+//	String segmentPointer = "";
+//	String segmentIndex = vmCommand.getArg2();
+//	boolean isStatic = vmCommand.getArg1().equals("static");
+//	boolean isPointer = vmCommand.getArg1().equals("pointer");if(vmCommand.getArg1().equals("pointer"))
+//	{
+//		segmentPointer = vmCommand.getArg2().equals("0") ? "THIS" : "THAT";
+//	}else
+//	{
+//		segmentPointer = getSegementPointer(vmCommand.getArg1(), segmentIndex);
+//	}
+//
+//	if(!isStatic)
+//	{
+//		calculateSegmentAddr(vmCommand, segmentPointer, segmentIndex);
+//	}
+//
+//	decrementStackPointer();
+//
+//	String variableName = getVariableName(vmCommand.getSourcefile(), segmentIndex, isStatic);
+//
+//	// read from stack and store in segment
+//	asm.append("A=M\n");asm.append("D=M\n");if(isPointer)
+//	{
+//		asm.append("@" + segmentPointer + LINE);
+//	}else
+//	{
+//		asm.append("@" + variableName + LINE);
+//	}if(!isStatic&&!isPointer)
+//	{
+//		asm.append("A=M\n");
+//	}asm.append("M=D\n");
 	}
 
 	private void generatePushCommand(VMCommand vmCommand) {
+		PushProcessor pushProcessor = new PushProcessor(asm);
+		String segmentName = vmCommand.getArg1();
+		switch (segmentName) {
+		case "local":
+		case "argument":
+		case "this":
+		case "that":
+		case "temp":
+			pushProcessor.pushProperSegments(vmCommand);
+			break;
+		case "constant":
+			pushProcessor.pushConstant(vmCommand);
+			break;
+		case "static":
+			pushProcessor.pushStatic(vmCommand);
+			break;
+		case "pointer":
+			pushProcessor.pushPointer(vmCommand);
+			break;
+		default:
 
-		String segmentIndex = vmCommand.getArg2();
-		String segmentPointer = "";
-		boolean isStatic = vmCommand.getArg1().equals("static");
-		if (vmCommand.getArg1().equals("constant")) {
-			asm.append("@" + segmentIndex + LINE);
-			asm.append("D=A\n");
-			asm.append("@" + stackPointer + LINE);
-			asm.append("A=M\n");
-			asm.append("M=D\n");
-			incrementStackPointer();
-			return;
-		} else if (vmCommand.getArg1().equals("pointer")) {
-			segmentPointer = vmCommand.getArg2().equals("0") ? "THIS" : "THAT";
-		} else {
-			segmentPointer = getSegementPointer(vmCommand.getArg1(), segmentIndex);
 		}
-
-		if (!isStatic) {
-			// first calculate addr = segmentPointer + segmentIndex
-			calculateSegmentAddr(vmCommand, segmentPointer, segmentIndex);
-			// Push to stack
-			asm.append("A=M\n");
-		} else {
-			String variableName = getVariableName(vmCommand.getSourcefile(), segmentIndex, isStatic);
-			asm.append("@" + variableName + LINE);
-		}
-		asm.append("D=M\n");
-		asm.append("@" + stackPointer + LINE);
-		asm.append("A=M\n");
-		asm.append("M=D\n");
-		incrementStackPointer();
 	}
 
 	private void generateNoop() {
 		asm.append("(STOP)\n");
 		asm.append("@STOP\n");
 		asm.append("0;JEQ\n");
-	}
-
-	private void incrementStackPointer() {
-		// increment the stack pointer
-		asm.append("@" + stackPointer + "\n");
-		asm.append("M=M+1\n");
 	}
 
 	private void decrementStackPointer() {
