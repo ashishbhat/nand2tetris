@@ -9,6 +9,7 @@ public class CodeWriter {
 	private static final int THIS = 3;
 	private static final int THAT = 4;
 	private StringBuilder asm = new StringBuilder();
+	private int counter = 0;
 
 	private static final String LINE = "\n";
 
@@ -52,60 +53,72 @@ public class CodeWriter {
 	}
 
 	private void generateGtCommand() {
+		int labelCount = getLabelCount();
+		String LABELNAME = String.format("LABEL%s", labelCount);
+		String LABEl = String.format("(%s)\n", LABELNAME);
+		String DONELABELNAME = String.format("DONE%s", labelCount);
+		String DONELABEL = String.format("(%s)\n", DONELABELNAME);
 		decrementStackPointer();
 		asm.append("A=M\n");
 		asm.append("D=M\n");
 		asm.append("A=A-1\n");
 		asm.append("D=D-M\n");
-		asm.append("@GT\n");
-		asm.append("D;JLT\n");
-		asm.append("@" + stackPointer + LINE);
-		asm.append("A=M-1\n");
 		asm.append("M=0\n");
-		asm.append("@STOP\n");
+		asm.append("@" + LABELNAME + LINE);
+		asm.append("D;JLT\n");
+		asm.append("@" + DONELABELNAME + LINE);
 		asm.append("0;JEQ\n");
-		asm.append("(GT)\n");
-		asm.append("@" + stackPointer + LINE);
+		asm.append(LABEl);
+		asm.append("@SP\n");
 		asm.append("A=M-1\n");
 		asm.append("M=-1\n");
+		asm.append(DONELABEL);
 	}
 
 	private void generateLtCommand() {
+		int labelCount = getLabelCount();
+		String LABELNAME = String.format("LABEL%s", labelCount);
+		String LABEl = String.format("(%s)\n", LABELNAME);
+		String DONELABELNAME = String.format("DONE%s", labelCount);
+		String DONELABEL = String.format("(%s)\n", DONELABELNAME);
 		decrementStackPointer();
 		asm.append("A=M\n");
 		asm.append("D=M\n");
 		asm.append("A=A-1\n");
 		asm.append("D=D-M\n");
-		asm.append("@LT\n");
-		asm.append("D;JGT\n");
-		asm.append("@" + stackPointer + LINE);
-		asm.append("A=M-1\n");
 		asm.append("M=0\n");
-		asm.append("@STOP\n");
+		asm.append("@" + LABELNAME + LINE);
+		asm.append("D;JGT\n");
+		asm.append("@" + DONELABELNAME + LINE);
 		asm.append("0;JEQ\n");
-		asm.append("(LT)\n");
-		asm.append("@" + stackPointer + LINE);
+		asm.append(LABEl);
+		asm.append("@SP\n");
 		asm.append("A=M-1\n");
 		asm.append("M=-1\n");
+		asm.append(DONELABEL);
 	}
 
 	private void generateEqCommand() {
+		int labelCount = getLabelCount();
+		String LABELNAME = String.format("LABEL%s", labelCount);
+		String LABEl = String.format("(%s)\n", LABELNAME);
+		String DONELABELNAME = String.format("DONE%s", labelCount);
+		String DONELABEL = String.format("(%s)\n", DONELABELNAME);
 		decrementStackPointer();
 		asm.append("A=M\n");
 		asm.append("D=M\n");
 		asm.append("A=A-1\n");
 		asm.append("D=D-M\n");
-		asm.append("@EQUAL\n");
-		asm.append("D;JEQ\n");
-		asm.append("@" + stackPointer + LINE);
-		asm.append("A=M-1\n");
 		asm.append("M=0\n");
-		asm.append("@STOP\n");
+		asm.append("@" + LABELNAME + LINE);
+		asm.append("D;JEQ\n");
+		asm.append("@" + DONELABELNAME + LINE);
 		asm.append("0;JEQ\n");
-		asm.append("(EQUAL)\n");
-		asm.append("@" + stackPointer + LINE);
+		asm.append(LABEl);
+		asm.append("@SP\n");
 		asm.append("A=M-1\n");
 		asm.append("M=-1\n");
+		asm.append(DONELABEL);
 	}
 
 	private void generateNotCommand() {
@@ -156,9 +169,9 @@ public class CodeWriter {
 	}
 
 	private void generateNegateCommand() {
-		asm.append("@" + stackPointer);
-		asm.append("A=M-1");
-		asm.append("M=-M");
+		asm.append("@" + stackPointer + LINE);
+		asm.append("A=M-1\n");
+		asm.append("M=-M\n");
 	}
 
 	private void generatePopCommand(VMCommand vmCommand) {
@@ -291,5 +304,10 @@ public class CodeWriter {
 
 	private String getVariableName(String file, String index, boolean isStatic) {
 		return isStatic ? (file + "." + index) : "addr";
+	}
+
+	private int getLabelCount() {
+		++counter;
+		return counter;
 	}
 }
