@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class CompilationEngine {
@@ -15,9 +17,14 @@ public class CompilationEngine {
 		tknzr = new JackTokenizer(sourcePath);
 	}
 
-	public void compile() {
+	public void compile() throws IOException {
 		compileClass();
-		System.out.print(compiledCode);
+		String outFile = sourcePath.getParent().toString() + "/" + sourcePath.getFileName().toString().split("\\.")[0]
+				+ ".xml";
+		FileWriter f = new FileWriter(outFile);
+		f.write(compiledCode.toString());
+		f.close();
+		// System.out.print(compiledCode);
 	}
 
 	private void compileClass() {
