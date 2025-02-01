@@ -37,6 +37,7 @@ public class CompilationEngine {
 		process("{");
 		compileClassVarDec();
 		compileSubroutine();
+		process("}");
 		compiledCode.append("</class>\n");
 	}
 
@@ -52,7 +53,8 @@ public class CompilationEngine {
 					state = ClassVarDecState.QUALIFIER;
 					tknzr.advance();
 				} else {
-					if (token.equals(LexicalElements.METHOD) || token.equals("}")) {
+					if (token.equals(LexicalElements.METHOD) || token.equals(LexicalElements.FUNCTION)
+							|| token.equals(LexicalElements.CONSTRUCTOR) || token.equals("}")) {
 						state = ClassVarDecState.TERMINATE;
 					} else {
 						throw new IllegalArgumentException(
@@ -159,7 +161,7 @@ public class CompilationEngine {
 	}
 
 	private void compileSubroutineBody() {
-		compiledCode.append("<subRoutineBody>\n");
+		compiledCode.append("<subroutineBody>\n");
 
 		process("{");
 		compileVarDec();
@@ -168,20 +170,21 @@ public class CompilationEngine {
 		compiledCode.append("</statements>\n");
 		process("}");
 
-		compiledCode.append("</subRoutineBody>\n");
+		compiledCode.append("</subroutineBody>\n");
 
 	}
 
 	private void compileVarDec() {
-		try {
-			if (LexicalElements.builtinTypes.contains(tknzr.token())
-					|| tknzr.tokenType().equals(LexicalElements.IDENTIFIER)) {
-				compiledCode.append("<varDec>\n");
-			}
-			processType();
-		} catch (Exception ex) {
+		if (!tknzr.token().equals("var")) {
 			return;
 		}
+		compiledCode.append("<varDec>\n");
+		process("var");
+		if (!LexicalElements.builtinTypes.contains(tknzr.token())
+				&& !tknzr.tokenType().equals(LexicalElements.IDENTIFIER)) {
+			throw new IllegalArgumentException("Compilation Error. Invalid type for subRoutine variable declaration.");
+		}
+		processType();
 		String token = tknzr.token();
 		while (!token.equals(";")) {
 			if (!tknzr.tokenType().equals(LexicalElements.IDENTIFIER)) {
@@ -243,6 +246,13 @@ public class CompilationEngine {
 		} else {
 			printXMLToken(tknzr.token());
 			tknzr.advance();
+			if (tknzr.token().equals("[")) {
+				process("[");
+				compiledCode.append("<expression>\n");
+				compileExpression();
+				compiledCode.append("</expression>\n");
+				process("]");
+			}
 		}
 		process("=");
 		compiledCode.append("<expression>\n");
@@ -263,8 +273,10 @@ public class CompilationEngine {
 			if (tknzr.token().equals("(")) {
 				if (tknzr.token().equals("(")) {
 					process("(");
-					compiledCode.append("</expressionList>\n");
-					compileExpressionList();
+					compiledCode.append("<expressionList>\n");
+					if (!tknzr.token().equals(")")) {
+						compileExpressionList();
+					}
 					compiledCode.append("</expressionList>\n");
 					process(")");
 					process(";");
@@ -278,7 +290,9 @@ public class CompilationEngine {
 					process(tknzr.token());
 					process("(");
 					compiledCode.append("<expressionList>\n");
-					compileExpressionList();
+					if (!tknzr.token().equals(")")) {
+						compileExpressionList();
+					}
 					compiledCode.append("</expressionList>\n");
 					process(")");
 					process(";");
@@ -313,7 +327,7 @@ public class CompilationEngine {
 		compileStatements();
 		compiledCode.append("</statements>\n");
 		process("}");
-		compiledCode.append("<whileStatement>\n");
+		compiledCode.append("</whileStatement>\n");
 	}
 
 	private void compileIfStatement() {
@@ -338,7 +352,7 @@ public class CompilationEngine {
 			compiledCode.append("</statements>\n");
 			process("}");
 		}
-		compiledCode.append("<ifStatement>\n");
+		compiledCode.append("</ifStatement>\n");
 	}
 
 	private void compileTerm() {
@@ -367,8 +381,10 @@ public class CompilationEngine {
 				else if (tknzr.token().equals("(")) {
 					if (tknzr.token().equals("(")) {
 						process("(");
-						compiledCode.append("</expressionList>\n");
-						compileExpressionList();
+						compiledCode.append("<expressionList>\n");
+						if (!tknzr.token().equals(")")) {
+							compileExpressionList();
+						}
 						compiledCode.append("</expressionList>\n");
 						process(")");
 					}
@@ -381,14 +397,18 @@ public class CompilationEngine {
 						process(tknzr.token());
 						process("(");
 						compiledCode.append("<expressionList>\n");
-						compileExpressionList();
+						if (!tknzr.token().equals(")")) {
+							compileExpressionList();
+						}
 						compiledCode.append("</expressionList>\n");
 						process(")");
 					}
 				}
 			} else if (tknzr.token().equals("(")) {
 				process(tknzr.token());
+				compiledCode.append("<expression>\n");
 				compileExpression();
+				compiledCode.append("</expression>\n");
 				process(")");
 			} else {
 				printXMLToken(tknzr.token());
@@ -462,10 +482,10 @@ public class CompilationEngine {
 			compiledCode.append("<integerConstant> " + token + " </integerConstant>\n");
 			break;
 		case LexicalElements.STRING_CONST:
-			compiledCode.append("<stringConstant> " + token + " </stringConstant>\n");
+			compiledCode.append("<stringConstant> " + tknzr.stringVal(token) + " </stringConstant>\n");
 			break;
 		case LexicalElements.SYMBOL:
-			compiledCode.append("<symbol> " + token + " </symbol>\n");
+			compiledCode.append("<symbol> " + tknzr.symbol(token) + " </symbol>\n");
 			break;
 		}
 

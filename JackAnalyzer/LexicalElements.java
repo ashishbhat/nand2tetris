@@ -39,8 +39,8 @@ public final class LexicalElements {
 	public static final List<String> builtinTypes = List.of("int", "char", "boolean");
 	public static final List<String> subRoutineTypes = List.of("method", "function", "constructor");
 	public static final List<String> statementTypes = List.of("if", "while", "do", "let", "return");
-	public static final List<String> keyWordConstants = List.of(TRUE, FALSE);
+	public static final List<String> keyWordConstants = List.of(TRUE, FALSE, NULL, THIS);
 	public static final List<String> unaryOps = List.of("-", "~");
-	public static final List<String> Ops = List.of("+", "-", "*", "/", "&", "*", "<", ">", "=");
+	public static final List<String> Ops = List.of("+", "-", "*", "/", "&", "|", "<", ">", "=");
 
 }

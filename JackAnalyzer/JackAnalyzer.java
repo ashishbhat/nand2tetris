@@ -3,7 +3,7 @@ import java.nio.file.Paths;
 
 public class JackAnalyzer {
 	public static void main(String[] args) {
-		Path sourcePath = Paths.get("/home/ashishbh/test_doc");
+		Path sourcePath = Paths.get("/home/ashishbh/Downloads/projects/10/Square/SquareGame.jack");
 		JackTokenizer tokenizer = new JackTokenizer(sourcePath);
 		StringBuilder tokenizedOutput = new StringBuilder();
 
