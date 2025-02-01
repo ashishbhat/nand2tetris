@@ -29,7 +29,8 @@ public class JackAnalyzer {
 		*/
 
 		// START COMPILATION
-		List<Path> files = Files.walk(sourcePath, 2).filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
+		List<Path> files = Files.walk(sourcePath, 2).filter(p -> !Files.isDirectory(p))
+				.filter(p -> p.getFileName().toString().endsWith(".jack")).collect(Collectors.toList());
 		for (Path file : files) {
 			CompilationEngine compilationEngine = new CompilationEngine(file);
 			compilationEngine.compile();
