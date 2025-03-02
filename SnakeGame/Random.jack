@@ -1,0 +1,30 @@
+class Random{
+    function int randomX(int seed){
+        var int x;
+        let seed = Random.modulo(seed,500);
+        let x = Random.generateRandomNumber(500,30,20,seed);
+        let x = 15+Random.modulo(x,(499-15+1));
+        return x;
+    }
+
+    function int randomY(int seed){
+        var int y;
+        let seed = Random.modulo(seed,240);
+        let y = Random.generateRandomNumber(240,35,10,seed);
+        let y = 15+Random.modulo(y,(239-15+1));
+        return y;
+    }
+
+    function int generateRandomNumber(int modulus, int multiplier, int incrementer, int seed){
+        var int p;
+        let p = Math.multiply(multiplier,seed);
+        let p = p + incrementer;
+        return Random.modulo(p,modulus);
+    }
+    
+    function int modulo(int x, int y){
+        var int q;
+        let q = Math.divide(x,y);
+        return (x - Math.multiply(y,q));
+    }
+}

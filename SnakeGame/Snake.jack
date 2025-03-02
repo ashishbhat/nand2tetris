@@ -1,0 +1,117 @@
+// A snake is a list of 5x5 square blocks. 
+class Snake{
+    field Block head;
+    field Block tail;
+
+    constructor Snake new(){
+        let head = Block.new(100,100,0,null);
+        let tail=head;
+        return this;
+    }
+
+    method Block getHead(){
+        return head;
+    }
+
+    method void draw(){
+        var Block b;
+        let b = head;
+        while(~(b = null)){
+            do b.draw();
+            let b = b.getNext();
+        }
+        return;
+    }
+
+    // when snake consumes a prey, a new 5x5 block gets added to the tail of the snake. 
+    // we calculate the coordinates of the new block based on the direction and coordinates 
+    // of the tail.
+    method void grow(){
+        var int tailDirection;
+        let tailDirection = tail.getDirection();
+        if((tailDirection = 1)|(tailDirection = 0)){
+            do tail.setNext(Block.new(tail.getX(),tail.getY()+5,tail.getDirection(),null));
+        }
+        if(tailDirection = -1){
+            do tail.setNext(Block.new(tail.getX(),tail.getY()-5,tail.getDirection(),null));
+        }
+        if(tailDirection = 2){
+            do tail.setNext(Block.new(tail.getX()-5,tail.getY(),tail.getDirection(),null));
+        }
+        if(tailDirection = -2){
+            do tail.setNext(Block.new(tail.getX()+5,tail.getY(),tail.getDirection(),null));
+        }
+
+        let tail = tail.getNext();
+        return;
+    }
+
+    // every block of the snake follows the block ahead of it. 
+    method void move(int direction){
+        var Block b;
+        // first update the direction of each block. The direction of each block will be set equal to the the direction of the 
+        // block ahead of it. The direction of the snake is set equal to the user supplied input. In this manner all the blocks
+        // move after each other.
+        do updateDirections(head,head.getNext(),direction);
+        let b = head;
+
+        // once we have updated the directions of the blocks, we will calculate the coordinates of the block for the next step.
+        while(~(b = null)){
+            do b.updateCoordinates();
+            let b = b.getNext();
+        }
+        let b = head;
+        // once the coordinates of the blocks are updated, draw the blocks in the list.
+        while(~(b = null)){
+            do b.draw();
+            let b = b.getNext();
+        }
+        return;
+    }
+
+    method int size(){
+        var int sz;
+        var Block b;
+        let b = head;
+        while(~(b = null)){
+            let sz = sz + 1;
+            let b = b.getNext();
+        }
+        return sz;
+    }
+
+    method void updateDirections(Block current, Block next, int headDirection){
+        if(size() = 1){
+            do current.setDirection(headDirection);
+            return;
+        }
+        if(next = null){
+            return;
+        }
+        do updateDirections(next, next.getNext(),headDirection);
+        do next.setDirection(current.getDirection());
+        // if snake size is greater than 1 then we will not allow the snake to make a 180 degree U-turn.
+        // For example, if a snake is moving in right direction than snake connot move left without turing up or down first.
+        if((current = head)&(~(Math.abs(current.getDirection()) = Math.abs(headDirection)))){
+            do setHeadDirection(headDirection);
+        }
+        return;
+    }
+
+    // if the snake loops on to itself then game is over.
+    method boolean detectLoop(){
+       var Block first,second;
+       let first = head;
+       let second = head.getNext();
+       while(~(second = null)){
+            if((first.getX() = second.getX())&(first.getY() = second.getY())){return true;}
+            let second = second.getNext();
+       }
+       return false;
+    }
+
+    method void setHeadDirection(int direction){
+        do head.setDirection(direction);
+        return;
+    }
+}

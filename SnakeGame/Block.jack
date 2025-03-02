@@ -1,0 +1,75 @@
+//A 5x5 square block. A snake is a list of blocks.
+class Block{
+    field int x,y;
+    field int direction;
+    field Block next;
+
+    constructor Block new(int Ax, int Ay, int d, Block b){
+        let x=Ax;
+        let y=Ay;
+        let direction=d;
+        let next=b;
+        return this;
+    }
+    
+    // update the coordinates of the block based on the direction of the block.
+    //  1 = up
+    // -1 = down
+    //  2 = right
+    // -2 = down
+    //  0 = no change in direction. 
+    method void updateCoordinates(){
+        var int x0,y0;
+        let x0 = x;
+        let y0 = y;
+        if(direction = 0){return;}
+        if(direction = 1){let y0 = y0-5;} 
+        if(direction = -1){let y0 = y0+5;}
+        if(direction = 2){let x0 = x0+5;}
+        if(direction = -2){let x0 = x0-5;}
+        let x = x0;
+        let y = y0;
+        return;
+    }
+
+    method void draw(){
+        do Screen.drawRectangle(x,y,x+5,y+5);
+        return;
+    }
+
+    method Block getNext(){
+        return next;
+    }
+
+    method void setNext(Block b){
+        let next = b;
+        return;
+    }
+
+    method int getDirection(){
+        return direction;
+    }
+
+    method void setDirection(int dir){
+        let direction = dir;
+        return;
+    }
+
+    method int getX(){
+        return x;
+    }
+
+    method int getY(){
+        return y;
+    }
+
+    method void setX(int newX){
+        let x = newX;
+        return;
+    }
+
+    method void setY(int newY){
+        let y = newY;
+        return;
+    }
+}

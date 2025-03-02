@@ -1,0 +1,21 @@
+class Main{
+ function void main(){
+        var int x;
+        var int y;
+        var Game snakeGame;
+        let x = 0;
+        do Output.printString("Press some keys randomly to start the game!");
+        do Output.println();
+        while(x < 500){
+            let x = x + Keyboard.readChar();
+        }
+        do Screen.clearScreen();
+        let x = Random.randomX(x);
+        let y = Random.randomY(x+5);
+        let snakeGame = Game.new(x,y);
+        do snakeGame.drawFrame();
+        //do snakeGame.displayScore();
+        do snakeGame.start();
+    return;
+ }    
+}

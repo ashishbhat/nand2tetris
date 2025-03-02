@@ -1,0 +1,108 @@
+class Game{
+    field Snake snake;
+    field int score;
+    field Block prey;
+
+    constructor Game new(int x, int y){
+        let snake = Snake.new();
+        let prey =  Block.new(x,y,0,null);
+        let score = 0;
+        return this;
+    }
+
+    method void start(){
+        var int direction;
+        var int keyPressed;
+        var int newX, newY;
+        let direction = 0;
+        do snake.draw();
+        do prey.draw();
+        do Output.moveCursor(0,0);
+        do Output.printString("User arrow keys to move the snake");
+        // wait for the user to press an arrow key.
+        while(direction = 0){
+            let keyPressed = Keyboard.keyPressed();
+            let direction = getDirection(keyPressed);
+        }
+        do snake.setHeadDirection(direction);
+        while(true){
+            do Screen.clearScreen();
+            do drawFrame();
+            do prey.draw();
+            do snake.move(direction);
+            //check if the snake has ventured outside the frame. If so then it is gameOver.
+            do checkOutside();
+            // snake will grow in size when snake eats the prey.
+            if(preyConsumed()){
+                do snake.grow();
+                let score = score+1;
+                let newX = Random.randomX(prey.getX());
+                let newY = Random.randomY(prey.getY());
+                do prey.setX(newX);
+                do prey.setY(newY);
+            }
+            // if the snake loops on to itseld then it is gameover.
+            if(snake.detectLoop()){
+                do gameOver();
+            }
+            do displayScore();
+            do Sys.wait(100);
+            let keyPressed = Keyboard.keyPressed();
+            let direction = getDirection(keyPressed);
+        }
+        return;
+    }
+
+    method void drawFrame(){
+        do Screen.drawLine(15,15,500,15);
+        do Screen.drawLine(15,240,500,240);
+        do Screen.drawLine(15,15,15,240);
+        do Screen.drawLine(500,15,500,240);
+        return;
+    }
+
+    method void checkOutside(){
+        var Block snakeHead;
+        let snakeHead = snake.getHead();
+        if((snakeHead.getX() > 500) | (snakeHead.getX() < 15) | (snakeHead.getY() < 15) | (snakeHead.getY() > 240) ){
+            do gameOver();
+        }
+        return;
+    }
+
+    method void gameOver(){
+        do displayScore();
+        do Output.moveCursor(20,20);
+        do Output.printString("GAME OVER!!!");
+        do Sys.halt();
+        return;
+    }
+
+    method void displayScore(){
+        do Output.moveCursor(0,0);
+        do Output.printString("Score:");
+        do Output.printInt(score);
+        return;
+    }
+
+    method int getDirection(int keyPressed){
+        var int direction;
+        var Block b;
+        let b = snake.getHead();
+        let direction = b.getDirection();
+        if( keyPressed = 130) {let direction = -2;}
+        if( keyPressed = 131) {let direction = 1;}
+        if( keyPressed = 132) {let direction = 2;}
+        if( keyPressed = 133) {let direction = -1;}
+        return direction;
+    }
+
+    method boolean preyConsumed(){
+        var Block snakeHead;
+        let snakeHead = snake.getHead();
+        if((snakeHead.getX() = prey.getX())&(snakeHead.getY() = prey.getY())){
+            return true;
+        }
+        return false;
+    }
+}
