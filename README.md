@@ -1,5 +1,6 @@
 # nand2tetris
-What it this? 
+What it this?
+
 This is a personal project repo containing completed exercises for the Nand2Tetris course — a famous course that teaches you how to build a modern computer from the ground up, starting from basic logic gates.
 
 Language breakdown: Primarily Java (97.9%), with a small amount of Assembly (2%) and Shell scripts (0.1%).
