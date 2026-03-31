@@ -14,7 +14,7 @@ JackAnalyzer — A tokenizer/parser for the Jack programming language (the high-
 
 JackCompiler — A full compiler that translates Jack code down to VM code.
 
-SnakeGame — A Snake game written in Jack, likely as a capstone project to test the full toolchain.
+SnakeGame — A Snake game written in Jack, as a capstone project to test the full toolchain.
 
 part2/week1 — Some additional work from Part 2 of the course.
 
